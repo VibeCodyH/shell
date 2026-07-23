@@ -236,6 +236,7 @@ For example, to disable the bar on DP-1:
 > - `bar.workspaces` (`perMonitorWorkspaces`, `specialWorkspaceIcons`, `windowIcons`)
 > - `bar.tray` (`iconSubs`, `hiddenIcons`)
 > - `dashboard` (`mediaUpdateInterval`, `resourceUpdateInterval`)
+> - `dashboard.calendar` (`eventsFile`)
 > - `launcher` (`specialPrefix`, `actionPrefix`, `enableDangerousActions`, `vimKeybinds`,
 >   `favouriteApps`, `hiddenApps`, `actions`)
 > - `launcher.useFuzzy` (`apps`, `actions`, `schemes`, `variants`, `wallpapers`)
@@ -415,6 +416,7 @@ For example, to disable the bar on DP-1:
         }
     },
     "bar": {
+        "position": "left",
         "persistent": true,
         "showOnHover": true,
         "dragThreshold": 20,
@@ -491,6 +493,10 @@ For example, to disable the bar on DP-1:
                 "enabled": true
             },
             {
+                "id": "taskbar",
+                "enabled": false
+            },
+            {
                 "id": "spacer",
                 "enabled": true
             },
@@ -527,6 +533,7 @@ For example, to disable the bar on DP-1:
         "smoothing": 20
     },
     "dashboard": {
+        "position": "top",
         "enabled": true,
         "showOnHover": true,
         "showDashboard": true,
@@ -543,6 +550,11 @@ For example, to disable the bar on DP-1:
             "showMemory": true,
             "showStorage": true,
             "showNetwork": true
+        },
+        "calendar": {
+            "eventsFile": "",
+            "showEvents": true,
+            "maxShown": 4
         }
     },
     "launcher": {
