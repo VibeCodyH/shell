@@ -267,6 +267,21 @@ CustomMouseArea {
         }
     }
 
+    // Keep the dashboard open if a tab switch resizes it away from the cursor
+    Connections {
+        function onWidthChanged() {
+            if (root.screenState.dashboard && !root.dashboardShortcutActive && !root.inDashboardArea(root.mouseX, root.mouseY))
+                root.dashboardShortcutActive = true;
+        }
+
+        function onHeightChanged() {
+            if (root.screenState.dashboard && !root.dashboardShortcutActive && !root.inDashboardArea(root.mouseX, root.mouseY))
+                root.dashboardShortcutActive = true;
+        }
+
+        target: root.panels.dashboard
+    }
+
     // Monitor individual visibility changes
     Connections {
         function onLauncherChanged() {
