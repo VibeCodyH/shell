@@ -24,6 +24,19 @@ public:
         : ConfigObject(parent) {}
 };
 
+class DashboardCalendar : public ConfigObject {
+    Q_OBJECT
+    QML_ANONYMOUS
+
+    CONFIG_GLOBAL_PROPERTY(QString, eventsFile, u""_s)
+    CONFIG_PROPERTY(bool, showEvents, true)
+    CONFIG_PROPERTY(int, maxShown, 4)
+
+public:
+    explicit DashboardCalendar(QObject* parent = nullptr)
+        : ConfigObject(parent) {}
+};
+
 class DashboardConfig : public ConfigObject {
     Q_OBJECT
     QML_ANONYMOUS
@@ -39,11 +52,13 @@ class DashboardConfig : public ConfigObject {
     CONFIG_GLOBAL_PROPERTY(int, resourceUpdateInterval, 1000)
     CONFIG_PROPERTY(int, dragThreshold, 50)
     CONFIG_SUBOBJECT(DashboardPerformance, performance)
+    CONFIG_SUBOBJECT(DashboardCalendar, calendar)
 
 public:
     explicit DashboardConfig(QObject* parent = nullptr)
         : ConfigObject(parent)
-        , m_performance(new DashboardPerformance(this)) {}
+        , m_performance(new DashboardPerformance(this))
+        , m_calendar(new DashboardCalendar(this)) {}
 };
 
 } // namespace caelestia::config

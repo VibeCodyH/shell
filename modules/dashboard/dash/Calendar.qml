@@ -16,6 +16,7 @@ CustomMouseArea {
     required property ScreenState screenState
 
     property date currentDate: screenState.dashboardDate
+    property date selectedDate: new Date()
     readonly property int currMonth: currentDate.getMonth()
     readonly property int currYear: currentDate.getFullYear()
     readonly property int nonAnimCurrMonth: screenState.dashboardDate.getMonth()
@@ -196,9 +197,15 @@ CustomMouseArea {
                     id: dayItem
 
                     required property var model
+                    readonly property bool selected: model.date.getDate() === root.selectedDate.getDate() && model.month === root.selectedDate.getMonth() && model.year === root.selectedDate.getFullYear()
 
                     implicitWidth: implicitHeight
                     implicitHeight: text.implicitHeight + Tokens.padding.small
+
+                    StateLayer {
+                        radius: height / 2
+                        onClicked: root.selectedDate = dayItem.model.date
+                    }
 
                     StyledText {
                         id: text
@@ -216,6 +223,18 @@ CustomMouseArea {
                         }
                         opacity: dayItem.model.today || dayItem.model.month === grid.month ? 1 : 0.4
                         font: Tokens.font.body.small
+                    }
+
+                    StyledRect {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: text.bottom
+                        anchors.topMargin: -Tokens.padding.extraSmall / 2
+
+                        implicitWidth: 4
+                        implicitHeight: 4
+                        radius: Tokens.rounding.full
+                        color: Colours.palette.m3primary
+                        visible: Config.dashboard.calendar.showEvents && CalendarEvents.hasEvents(dayItem.model.date)
                     }
                 }
             }
@@ -254,6 +273,16 @@ CustomMouseArea {
                     colorizationColor: Colours.palette.m3onPrimary
                 }
             }
+        }
+
+        EventList {
+            id: agenda
+
+            Layout.fillWidth: true
+            Layout.topMargin: visible ? Tokens.spacing.small : 0
+
+            visible: Config.dashboard.calendar.showEvents && events.length > 0
+            selectedDate: root.selectedDate
         }
     }
 }
