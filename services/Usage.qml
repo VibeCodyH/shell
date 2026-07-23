@@ -33,15 +33,25 @@ Singleton {
         root.valid = true;
     }
 
+    // Polled, not watched: the statusline rewrites this file every second, and a
+    // watch would force a reload + dashboard relayout at that rate.
     FileView {
+        id: view
+
         path: `${Paths.home}/.claude/usage-snapshot.json`
-        watchChanges: true
         printErrors: false
-        onFileChanged: reload()
         onLoaded: root.load(text())
         onLoadFailed: err => {
             if (err === FileViewError.FileNotFound)
                 root.valid = false;
         }
+    }
+
+    Timer {
+        running: true
+        interval: 30000
+        triggeredOnStart: true
+        repeat: true
+        onTriggered: view.reload()
     }
 }

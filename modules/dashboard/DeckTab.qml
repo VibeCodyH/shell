@@ -21,52 +21,64 @@ Item {
         anchors.top: parent.top
         spacing: Tokens.spacing.medium
 
-        Card {
+        StyledRect {
+            Layout.fillWidth: true
+            Layout.preferredHeight: brief.implicitHeight + Tokens.padding.large * 2
+
+            color: Colours.tPalette.m3surfaceContainer
+            radius: Tokens.rounding.extraLarge
+
             BriefCard {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
+                id: brief
+
+                anchors.fill: parent
                 anchors.margins: Tokens.padding.large
             }
         }
 
-        Card {
+        StyledRect {
+            Layout.fillWidth: true
+            Layout.preferredHeight: triage.implicitHeight + Tokens.padding.large * 2
+
+            color: Colours.tPalette.m3surfaceContainer
+            radius: Tokens.rounding.extraLarge
+
             TriageCard {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
+                id: triage
+
+                anchors.fill: parent
                 anchors.margins: Tokens.padding.large
             }
         }
 
-        Card {
+        StyledRect {
+            Layout.fillWidth: true
+            Layout.preferredHeight: prs.implicitHeight + Tokens.padding.large * 2
+
+            color: Colours.tPalette.m3surfaceContainer
+            radius: Tokens.rounding.extraLarge
+
             PrsCard {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
+                id: prs
+
+                anchors.fill: parent
                 anchors.margins: Tokens.padding.large
             }
         }
 
-        Card {
+        StyledRect {
+            Layout.fillWidth: true
+            Layout.preferredHeight: usage.implicitHeight + Tokens.padding.large * 2
+
+            color: Colours.tPalette.m3surfaceContainer
+            radius: Tokens.rounding.extraLarge
+
             UsageCard {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
+                id: usage
+
+                anchors.fill: parent
                 anchors.margins: Tokens.padding.large
             }
         }
-    }
-
-    component Card: StyledRect {
-        default property Item content
-
-        Layout.fillWidth: true
-        Layout.preferredHeight: (content?.implicitHeight ?? 0) + Tokens.padding.large * 2
-
-        color: Colours.tPalette.m3surfaceContainer
-        radius: Tokens.rounding.extraLarge
-
-        children: content ? [content] : []
     }
 }
