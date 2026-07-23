@@ -36,6 +36,11 @@ GridLayout {
         return horizontal ? c.x : c.y;
     }
 
+    function entryAt(pos: real): string {
+        const ch = (horizontal ? childAt(pos, height / 2) : childAt(width / 2, pos)) as EntryWrapper;
+        return ch?.entryId ?? "";
+    }
+
     function checkPopout(pos: real): void {
         const ch = (horizontal ? childAt(pos, height / 2) : childAt(width / 2, pos)) as EntryWrapper;
 
@@ -78,6 +83,8 @@ GridLayout {
             popouts.currentName = id.toLowerCase();
             popouts.currentCenter = axisCenterOf(ch.item as Item);
             popouts.hasCurrent = true;
+        } else if (id === "power" && horizontal) {
+            popouts.hasCurrent = false;
         }
     }
 

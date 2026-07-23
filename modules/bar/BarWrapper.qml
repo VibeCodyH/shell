@@ -35,6 +35,10 @@ Item {
         (content.item as Bar)?.checkPopout(pos);
     }
 
+    function entryAt(pos: real): string {
+        return (content.item as Bar)?.entryAt(pos) ?? "";
+    }
+
     function handleWheel(pos: real, angleDelta: point): void {
         (content.item as Bar)?.handleWheel(pos, angleDelta);
     }

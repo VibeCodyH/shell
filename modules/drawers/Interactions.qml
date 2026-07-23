@@ -200,9 +200,9 @@ CustomMouseArea {
 
         // Show launcher on hover, or show/hide on drag if hover is disabled
         if (Config.launcher.showOnHover) {
-            if (!screenState.launcher && inBottomPanel(panels.launcher, x, y))
+            if (!screenState.launcher && inBottomPanel(panels.launcher, x, y) && !(geometry.barOnBottom && geometry.barContains(x, y)))
                 screenState.launcher = true;
-        } else if (pressed && inBottomPanel(panels.launcher, dragStart.x, dragStart.y) && withinPanelWidth(panels.launcher, x, y)) {
+        } else if (pressed && inBottomPanel(panels.launcher, dragStart.x, dragStart.y) && !(geometry.barOnBottom && geometry.barContains(dragStart.x, dragStart.y)) && withinPanelWidth(panels.launcher, x, y)) {
             if (dragY < -Config.launcher.dragThreshold)
                 screenState.launcher = true;
             else if (dragY > Config.launcher.dragThreshold)
@@ -210,7 +210,7 @@ CustomMouseArea {
         }
 
         // Show dashboard on hover
-        const showDashboard = Config.dashboard.showOnHover && inTopPanel(panels.dashboard, x, y);
+        const showDashboard = Config.dashboard.showOnHover && inTopPanel(panels.dashboard, x, y) && !(geometry.barOnTop && geometry.barContains(x, y));
 
         // Always update visibility based on hover if not in shortcut mode
         if (!dashboardShortcutActive) {
@@ -221,15 +221,21 @@ CustomMouseArea {
         }
 
         // Show/hide dashboard on drag (for touchscreen devices)
-        if (pressed && inTopPanel(panels.dashboard, dragStart.x, dragStart.y) && withinPanelWidth(panels.dashboard, x, y)) {
+        if (pressed && inTopPanel(panels.dashboard, dragStart.x, dragStart.y) && !(geometry.barOnTop && geometry.barContains(dragStart.x, dragStart.y)) && withinPanelWidth(panels.dashboard, x, y)) {
             if (dragY > Config.dashboard.dragThreshold)
                 screenState.dashboard = true;
             else if (dragY < -Config.dashboard.dragThreshold)
                 screenState.dashboard = false;
         }
 
-        // Show utilities on hover
-        const showUtilities = inBottomPanel(panels.utilities, x, y, true);
+        // Show utilities on hover; on a bottom bar it rides the power entry instead of an edge zone
+        let showUtilities;
+        if (geometry.barOnBottom) {
+            const entry = geometry.barContains(x, y) ? bar.entryAt(geometry.axisPos(x, y)) : "";
+            showUtilities = entry === "power" || (screenState.utilities && !entry && inBottomPanel(panels.utilities, x, y, true));
+        } else {
+            showUtilities = inBottomPanel(panels.utilities, x, y, true);
+        }
 
         // Always update visibility based on hover if not in shortcut mode
         if (!utilitiesShortcutActive) {
