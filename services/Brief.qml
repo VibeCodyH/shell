@@ -17,6 +17,17 @@ Singleton {
     property int teams: 0
     property int github: 0
     property list<var> rows: []
+    property var hidden: ({})
+
+    readonly property list<var> visibleRows: rows.filter(r => !root.hidden[r.key])
+
+    // In-memory dismiss (resurfaces on the next 9am/5pm brief render, like the old
+    // deck's per-day ✓ — permanent muting stays a separate `mute.mjs` action).
+    function dismiss(key: string): void {
+        const h = Object.assign({}, root.hidden);
+        h[key] = true;
+        root.hidden = h;
+    }
 
     function load(data: string): void {
         let d;

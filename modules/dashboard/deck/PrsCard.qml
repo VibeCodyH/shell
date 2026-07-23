@@ -38,31 +38,48 @@ ColumnLayout {
     Repeater {
         model: PullRequests.prs
 
-        RowLayout {
+        StyledRect {
             id: pr
 
             required property var modelData
 
             Layout.fillWidth: true
-            spacing: Tokens.spacing.small
+            implicitHeight: prRow.implicitHeight + Tokens.spacing.small
 
-            StyledText {
-                text: `#${pr.modelData.number}`
-                color: Colours.palette.m3onSurfaceVariant
-                font: Tokens.font.body.small
+            radius: Tokens.rounding.small
+            color: "transparent"
+
+            StateLayer {
+                disabled: !pr.modelData.url
+                onClicked: Qt.openUrlExternally(pr.modelData.url)
             }
 
-            StyledText {
-                Layout.fillWidth: true
-                text: pr.modelData.title
-                font: Tokens.font.body.small
-                elide: Text.ElideRight
-            }
+            RowLayout {
+                id: prRow
 
-            StyledText {
-                text: pr.modelData.isDraft ? qsTr("draft") : pr.modelData.reviewDecision === "APPROVED" ? qsTr("approved") : pr.modelData.reviewDecision === "CHANGES_REQUESTED" ? qsTr("changes") : qsTr("review")
-                color: pr.modelData.isDraft ? Colours.palette.m3onSurfaceVariant : pr.modelData.reviewDecision === "APPROVED" ? Colours.palette.m3primary : pr.modelData.reviewDecision === "CHANGES_REQUESTED" ? Colours.palette.m3error : Colours.palette.m3onSurfaceVariant
-                font: Tokens.font.body.small
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Tokens.spacing.small
+
+                StyledText {
+                    text: `#${pr.modelData.number}`
+                    color: Colours.palette.m3onSurfaceVariant
+                    font: Tokens.font.body.small
+                }
+
+                StyledText {
+                    Layout.fillWidth: true
+                    text: pr.modelData.title
+                    font: Tokens.font.body.small
+                    elide: Text.ElideRight
+                }
+
+                StyledText {
+                    text: pr.modelData.isDraft ? qsTr("draft") : pr.modelData.reviewDecision === "APPROVED" ? qsTr("approved") : pr.modelData.reviewDecision === "CHANGES_REQUESTED" ? qsTr("changes") : qsTr("review")
+                    color: pr.modelData.isDraft ? Colours.palette.m3onSurfaceVariant : pr.modelData.reviewDecision === "APPROVED" ? Colours.palette.m3primary : pr.modelData.reviewDecision === "CHANGES_REQUESTED" ? Colours.palette.m3error : Colours.palette.m3onSurfaceVariant
+                    font: Tokens.font.body.small
+                }
             }
         }
     }

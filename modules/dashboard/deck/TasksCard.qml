@@ -10,6 +10,8 @@ import qs.services
 ColumnLayout {
     id: root
 
+    readonly property string today: Qt.formatDate(new Date(), "yyyy-MM-dd")
+
     spacing: Tokens.spacing.small
 
     RowLayout {
@@ -17,40 +19,41 @@ ColumnLayout {
         spacing: Tokens.spacing.small
 
         MaterialIcon {
-            text: "forum"
+            text: "flag"
             color: Colours.palette.m3primary
             fontStyle: Tokens.font.icon.large
         }
 
         StyledText {
             Layout.fillWidth: true
-            text: qsTr("Teams triage")
+            text: qsTr("Flagged & tasks")
             font: Tokens.font.title.small
         }
 
         StyledText {
-            text: TeamsTriage.visibleItems.length > 0 ? qsTr("%1 to action").arg(TeamsTriage.visibleItems.length) : qsTr("Clear")
-            color: TeamsTriage.visibleItems.length > 0 ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
+            text: Tasks.visibleTasks.length > 0 ? qsTr("%1 open").arg(Tasks.visibleTasks.length) : qsTr("Clear")
+            color: Tasks.visibleTasks.length > 0 ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
             font: Tokens.font.body.small
         }
     }
 
     Repeater {
-        model: TeamsTriage.visibleItems
+        model: Tasks.visibleTasks
 
         StyledRect {
-            id: item
+            id: task
 
             required property var modelData
+            readonly property bool overdue: task.modelData.due && task.modelData.due < root.today
 
             Layout.fillWidth: true
-            implicitHeight: itemRow.implicitHeight + Tokens.spacing.small
+            implicitHeight: taskRow.implicitHeight + Tokens.spacing.small
 
             radius: Tokens.rounding.small
             color: "transparent"
 
             RowLayout {
-                id: itemRow
+                id: taskRow
 
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -59,39 +62,42 @@ ColumnLayout {
 
                 StyledRect {
                     Layout.fillWidth: true
-                    implicitHeight: textCol.implicitHeight
+                    implicitHeight: openRow.implicitHeight
 
                     radius: Tokens.rounding.small
                     color: "transparent"
 
                     StateLayer {
-                        disabled: !item.modelData.url
-                        onClicked: Qt.openUrlExternally(item.modelData.url)
+                        disabled: !task.modelData.url
+                        onClicked: Qt.openUrlExternally(task.modelData.url)
                     }
 
-                    ColumnLayout {
-                        id: textCol
+                    RowLayout {
+                        id: openRow
 
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: 0
+                        spacing: Tokens.spacing.small
 
-                        StyledText {
-                            Layout.fillWidth: true
-                            text: `${item.modelData.from} · ${item.modelData.source}`
+                        MaterialIcon {
+                            text: task.modelData.flagged ? "flag" : "check_box_outline_blank"
                             color: Colours.palette.m3onSurfaceVariant
-                            font: Tokens.font.label.small
-                            elide: Text.ElideRight
+                            fontStyle: Tokens.font.icon.small
                         }
 
                         StyledText {
                             Layout.fillWidth: true
-                            text: item.modelData.text
+                            text: task.modelData.title
                             font: Tokens.font.body.small
-                            wrapMode: Text.WordWrap
-                            maximumLineCount: 2
                             elide: Text.ElideRight
+                        }
+
+                        StyledText {
+                            visible: !!task.modelData.due
+                            text: task.modelData.due
+                            color: task.overdue ? Colours.palette.m3error : Colours.palette.m3onSurfaceVariant
+                            font: Tokens.font.label.small
                         }
                     }
                 }
@@ -99,8 +105,8 @@ ColumnLayout {
                 ClearButton {
                     icon: "check"
                     onClicked: {
-                        TeamsTriage.dismiss(item.modelData.id);
-                        Quickshell.execDetached(["/home/cody/.local/node/bin/node", "/home/cody/Projects/Personal/teams-triage/dismiss.mjs", item.modelData.id]);
+                        Tasks.dismiss(task.modelData.id);
+                        Quickshell.execDetached(["/home/cody/.local/node/bin/node", "/home/cody/Projects/Personal/teams-triage/tasks-deck.mjs", "--done", task.modelData.list, task.modelData.id]);
                     }
                 }
             }
@@ -109,8 +115,8 @@ ColumnLayout {
 
     StyledText {
         Layout.fillWidth: true
-        visible: TeamsTriage.visibleItems.length === 0
-        text: qsTr("Nothing awaiting your reply")
+        visible: Tasks.visibleTasks.length === 0
+        text: qsTr("Nothing flagged")
         color: Colours.palette.m3onSurfaceVariant
         font: Tokens.font.body.small
     }

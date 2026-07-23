@@ -38,6 +38,21 @@ Item {
 
         StyledRect {
             Layout.fillWidth: true
+            Layout.preferredHeight: tasks.implicitHeight + Tokens.padding.large * 2
+
+            color: Colours.tPalette.m3surfaceContainer
+            radius: Tokens.rounding.extraLarge
+
+            TasksCard {
+                id: tasks
+
+                anchors.fill: parent
+                anchors.margins: Tokens.padding.large
+            }
+        }
+
+        StyledRect {
+            Layout.fillWidth: true
             Layout.preferredHeight: triage.implicitHeight + Tokens.padding.large * 2
 
             color: Colours.tPalette.m3surfaceContainer

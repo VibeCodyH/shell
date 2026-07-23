@@ -30,35 +30,53 @@ ColumnLayout {
         }
 
         StyledText {
-            text: Brief.count > 0 ? qsTr("%1 open").arg(Brief.count) : qsTr("All clear")
-            color: Brief.count > 0 ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
+            text: Brief.visibleRows.length > 0 ? qsTr("%1 open").arg(Brief.visibleRows.length) : qsTr("All clear")
+            color: Brief.visibleRows.length > 0 ? Colours.palette.m3primary : Colours.palette.m3onSurfaceVariant
             font: Tokens.font.body.small
         }
     }
 
     Repeater {
-        model: Brief.rows
+        model: Brief.visibleRows
 
-        RowLayout {
+        StyledRect {
             id: row
 
             required property var modelData
 
             Layout.fillWidth: true
-            spacing: Tokens.spacing.small
+            implicitHeight: briefRow.implicitHeight + Tokens.spacing.small
 
-            StyledText {
-                Layout.alignment: Qt.AlignTop
-                text: `${row.modelData.n}.`
-                color: Colours.palette.m3onSurfaceVariant
-                font: Tokens.font.body.small
-            }
+            radius: Tokens.rounding.small
+            color: "transparent"
 
-            StyledText {
-                Layout.fillWidth: true
-                text: row.modelData.label
-                font: Tokens.font.body.small
-                wrapMode: Text.WordWrap
+            RowLayout {
+                id: briefRow
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Tokens.spacing.small
+
+                StyledText {
+                    Layout.alignment: Qt.AlignTop
+                    text: `${row.modelData.n}.`
+                    color: Colours.palette.m3onSurfaceVariant
+                    font: Tokens.font.body.small
+                }
+
+                StyledText {
+                    Layout.fillWidth: true
+                    text: row.modelData.label
+                    font: Tokens.font.body.small
+                    wrapMode: Text.WordWrap
+                }
+
+                ClearButton {
+                    Layout.alignment: Qt.AlignTop
+                    icon: "check"
+                    onClicked: Brief.dismiss(row.modelData.key)
+                }
             }
         }
     }

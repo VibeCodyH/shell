@@ -11,6 +11,17 @@ Singleton {
 
     property list<var> items: []
     property string generatedAt: ""
+    property var hidden: ({})
+
+    readonly property list<var> visibleItems: items.filter(i => !root.hidden[i.id])
+
+    // Optimistic hide: drop the row the moment it's cleared; the producer
+    // re-mirror (dismiss.mjs) then makes it permanent.
+    function dismiss(id: string): void {
+        const h = Object.assign({}, root.hidden);
+        h[id] = true;
+        root.hidden = h;
+    }
 
     function load(data: string): void {
         let d;
