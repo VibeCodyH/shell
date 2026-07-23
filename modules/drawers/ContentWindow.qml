@@ -249,7 +249,7 @@ StyledWindow {
             panel: panels.popoutsWrapper
             deformAmount: panels.popouts.isDetached ? 0.05 : panels.popouts.hasCurrent ? 0.15 : 0.1
             x: panels.popoutsWrapper.x + panels.popouts.x + geometry.insetLeft(root.borderThickness) - (geometry.horizontal ? 0 : panels.popouts.width * extraExtent)
-            y: panels.popoutsWrapper.y + panels.popouts.y + geometry.insetTop(root.borderThickness) - (geometry.horizontal ? panels.popouts.height * extraExtent : 0)
+            y: panels.popoutsWrapper.y + panels.popouts.y + geometry.insetTop(root.borderThickness) - (geometry.barOnTop ? panels.popouts.height * extraExtent : 0)
             implicitWidth: panels.popouts.width * (geometry.horizontal ? 1 : 1 + extraExtent)
             implicitHeight: panels.popouts.height * (geometry.horizontal ? 1 + extraExtent : 1)
 
