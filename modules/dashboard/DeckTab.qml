@@ -1,29 +1,41 @@
 pragma ComponentBehavior: Bound
 
 import "deck"
+import QtQuick
 import QtQuick.Layouts
+import Caelestia.Config
 import qs.components
+import qs.services
 
-ColumnLayout {
+Item {
     id: root
 
-    readonly property int cardWidth: Tokens.sizes.dashboard.userWidth * 2
+    implicitWidth: Tokens.sizes.dashboard.userWidth * 2
+    implicitHeight: content.implicitHeight
 
-    spacing: Tokens.spacing.medium
+    ColumnLayout {
+        id: content
 
-    StyledRect {
-        Layout.fillWidth: true
-        Layout.preferredWidth: root.cardWidth
-        Layout.preferredHeight: brief.implicitHeight + brief.anchors.margins * 2
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        spacing: Tokens.spacing.medium
 
-        color: Colours.tPalette.m3surfaceContainer
-        radius: Tokens.rounding.extraLarge
+        StyledRect {
+            Layout.fillWidth: true
+            Layout.preferredHeight: brief.implicitHeight + Tokens.padding.large * 2
 
-        BriefCard {
-            id: brief
+            color: Colours.tPalette.m3surfaceContainer
+            radius: Tokens.rounding.extraLarge
 
-            anchors.fill: parent
-            anchors.margins: Tokens.padding.large
+            BriefCard {
+                id: brief
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: Tokens.padding.large
+            }
         }
     }
 }
