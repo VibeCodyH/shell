@@ -30,7 +30,7 @@ Item {
         const otherModules = bar.children.filter(c => c.entryId && c.item !== this && c.entryId !== "spacer");
         const otherHeight = otherModules.reduce((acc, curr) => acc + (curr.item.nonAnimHeight ?? curr.height), 0);
         // Length - 2 cause repeater counts as a child
-        return bar.height - otherHeight - bar.spacing * (bar.children.length - 1) - bar.vPadding * 2;
+        return bar.height - otherHeight - bar.rowSpacing * (bar.children.length - 1) - bar.axisPadding * 2;
     }
     property Title current: text1
 

@@ -243,15 +243,17 @@ StyledWindow {
         PanelBg {
             id: popoutBg
 
-            // Extra width to prevent vertical movement deformation partially detaching panel from bar
-            property real extraWidth: panels.popouts.isDetached ? 0 : 0.2
+            // Extra extent to prevent axis movement deformation partially detaching panel from bar
+            property real extraExtent: panels.popouts.isDetached ? 0 : 0.2
 
             panel: panels.popoutsWrapper
             deformAmount: panels.popouts.isDetached ? 0.05 : panels.popouts.hasCurrent ? 0.15 : 0.1
-            x: panels.popoutsWrapper.x + panels.popouts.x + geometry.insetLeft(root.borderThickness) - panels.popouts.width * extraWidth
-            implicitWidth: panels.popouts.width * (1 + extraWidth)
+            x: panels.popoutsWrapper.x + panels.popouts.x + geometry.insetLeft(root.borderThickness) - (geometry.horizontal ? 0 : panels.popouts.width * extraExtent)
+            y: panels.popoutsWrapper.y + panels.popouts.y + geometry.insetTop(root.borderThickness) - (geometry.horizontal ? panels.popouts.height * extraExtent : 0)
+            implicitWidth: panels.popouts.width * (geometry.horizontal ? 1 : 1 + extraExtent)
+            implicitHeight: panels.popouts.height * (geometry.horizontal ? 1 + extraExtent : 1)
 
-            Behavior on extraWidth {
+            Behavior on extraExtent {
                 Anim {}
             }
         }
@@ -310,12 +312,15 @@ StyledWindow {
         BarWrapper {
             id: bar
 
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
+            anchors.top: geometry.barOnBottom ? undefined : parent.top
+            anchors.bottom: geometry.barOnTop ? undefined : parent.bottom
+            anchors.left: geometry.horizontal ? parent.left : undefined
+            anchors.right: geometry.horizontal ? parent.right : undefined
 
             screen: root.screen
             screenState: root.screenState
             popouts: panels.popouts
+            position: geometry.position
 
             fullscreen: root.hasFullscreen
         }
