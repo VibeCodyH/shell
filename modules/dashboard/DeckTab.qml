@@ -38,6 +38,24 @@ Item {
                 anchors.margins: Tokens.padding.large
             }
         }
+
+        Card {
+            PrsCard {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: Tokens.padding.large
+            }
+        }
+
+        Card {
+            UsageCard {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: Tokens.padding.large
+            }
+        }
     }
 
     component Card: StyledRect {

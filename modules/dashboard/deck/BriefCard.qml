@@ -9,6 +9,8 @@ import qs.services
 ColumnLayout {
     id: root
 
+    readonly property list<var> todayEvents: CalendarEvents.eventsForDate(new Date())
+
     spacing: Tokens.spacing.small
 
     RowLayout {
@@ -60,8 +62,6 @@ ColumnLayout {
             }
         }
     }
-
-    readonly property list<var> todayEvents: CalendarEvents.eventsForDate(new Date())
 
     StyledText {
         Layout.fillWidth: true
