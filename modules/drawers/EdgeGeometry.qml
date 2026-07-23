@@ -7,12 +7,14 @@ QtObject {
     required property Bar.BarWrapper bar
     required property var win
     required property string configPosition
+    required property string configDashboardPosition
 
     readonly property string position: configPosition === "top" || configPosition === "bottom" ? configPosition : "left"
     readonly property bool horizontal: position !== "left"
     readonly property bool barOnLeft: position === "left"
     readonly property bool barOnTop: position === "top"
     readonly property bool barOnBottom: position === "bottom"
+    readonly property bool dashboardOnLeft: configDashboardPosition === "left"
 
     readonly property real barExtent: bar.extent
     readonly property real barClamped: bar.clampedExtent
