@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Services.SystemTray
 import Caelestia.Config
 import qs.components
+import qs.services as Services
 
 Item {
     id: root
@@ -124,6 +125,25 @@ Item {
         Popout {
             name: "lockstatus"
             sourceComponent: LockStatus {}
+        }
+
+        Repeater {
+            model: ScriptModel {
+                values: Services.Hypr.toplevels.values
+            }
+
+            Popout {
+                id: taskbarPreview
+
+                required property var modelData
+                required property int index
+
+                name: `taskbar${index}`
+                sourceComponent: ActiveWindow {
+                    popouts: root.popouts
+                    client: taskbarPreview.modelData
+                }
+            }
         }
 
         Repeater {

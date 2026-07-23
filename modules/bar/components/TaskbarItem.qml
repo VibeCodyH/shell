@@ -11,6 +11,7 @@ StyledRect {
     id: root
 
     required property var modelData
+    required property int index
 
     readonly property var ipcObject: modelData?.lastIpcObject ?? null
     readonly property string appClass: ipcObject?.class ?? ""

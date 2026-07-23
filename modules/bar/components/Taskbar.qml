@@ -12,6 +12,8 @@ Item {
     required property ShellScreen screen
     required property bool horizontal
 
+    readonly property alias layout: layout
+
     clip: true
     implicitWidth: horizontal ? layout.implicitWidth : Tokens.sizes.bar.innerWidth
     implicitHeight: horizontal ? Tokens.sizes.bar.innerWidth : layout.implicitHeight

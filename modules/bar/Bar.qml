@@ -83,6 +83,14 @@ GridLayout {
             popouts.currentName = id.toLowerCase();
             popouts.currentCenter = axisCenterOf(ch.item as Item);
             popouts.hasCurrent = true;
+        } else if (id === "taskbar" && Config.bar.popouts.activeWindow) {
+            const taskbar = ch.item as Taskbar;
+            const item = (horizontal ? taskbar.layout.childAt(mapToItem(taskbar.layout, pos, 0).x, taskbar.layout.height / 2) : taskbar.layout.childAt(taskbar.layout.width / 2, mapToItem(taskbar.layout, 0, pos).y)) as TaskbarItem;
+            if (item) {
+                popouts.currentName = `taskbar${item.index}`;
+                popouts.currentCenter = Qt.binding(() => axisCenterOf(item));
+                popouts.hasCurrent = true;
+            }
         } else if (id === "power" && horizontal) {
             popouts.hasCurrent = false;
         }
