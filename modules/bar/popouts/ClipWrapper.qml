@@ -24,6 +24,9 @@ Item {
         return x > 0 ? 0 : 1;
     }
 
+    // Anchored, not y-bound: a Behavior-lagged y would dip the clip area into the bar while height animates
+    anchors.bottom: position === "bottom" && !content.isDetached ? parent.bottom : undefined
+
     visible: width > 0 && height > 0
     clip: true
 
@@ -46,7 +49,7 @@ Item {
         if (content.isDetached)
             return (parent.height - content.nonAnimHeight) / 2;
         if (horizontal)
-            return position === "top" ? 0 : parent.height - height;
+            return 0;
 
         const off = content.currentCenter - borderThickness - content.nonAnimHeight / 2;
         const diff = parent.height - Math.floor(off + content.nonAnimHeight);
