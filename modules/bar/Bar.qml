@@ -143,6 +143,7 @@ GridLayout {
                         objectName: "taskbarWorkspaces"
                         screen: root.screen
                         fullscreen: root.fullscreen
+                        horizontal: root.horizontal
                     }
                 }
             }
@@ -153,6 +154,7 @@ GridLayout {
                         objectName: "taskbarActiveWindow"
                         bar: root
                         monitor: Brightness.getMonitorForScreen(root.screen)
+                        horizontal: root.horizontal
                     }
                 }
             }
@@ -161,6 +163,7 @@ GridLayout {
                 delegate: EntryWrapper {
                     Tray {
                         objectName: "taskbarTray"
+                        horizontal: root.horizontal
                     }
                 }
             }
@@ -169,6 +172,7 @@ GridLayout {
                 delegate: EntryWrapper {
                     Clock {
                         objectName: "taskbarClock"
+                        horizontal: root.horizontal
                     }
                 }
             }
@@ -177,6 +181,7 @@ GridLayout {
                 delegate: EntryWrapper {
                     StatusIcons {
                         objectName: "taskbarStatusIcons"
+                        horizontal: root.horizontal
                     }
                 }
             }
