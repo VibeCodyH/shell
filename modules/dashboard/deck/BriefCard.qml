@@ -61,11 +61,40 @@ ColumnLayout {
         }
     }
 
+    readonly property list<var> todayEvents: CalendarEvents.eventsForDate(new Date())
+
     StyledText {
         Layout.fillWidth: true
-        visible: Brief.calendarCount > 0
-        text: qsTr("%1 event(s) today").arg(Brief.calendarCount)
+        Layout.topMargin: Tokens.spacing.small / 2
+        visible: root.todayEvents.length > 0
+        text: qsTr("Today")
         color: Colours.palette.m3onSurfaceVariant
         font: Tokens.font.label.small
+    }
+
+    Repeater {
+        model: root.todayEvents
+
+        RowLayout {
+            id: evRow
+
+            required property var modelData
+
+            Layout.fillWidth: true
+            spacing: Tokens.spacing.small
+
+            StyledText {
+                text: evRow.modelData.allDay ? qsTr("All day") : Qt.formatTime(evRow.modelData.start, "h:mm AP")
+                color: Colours.palette.m3primary
+                font: Tokens.font.body.builders.small.scale(0.9).build()
+            }
+
+            StyledText {
+                Layout.fillWidth: true
+                text: evRow.modelData.title
+                font: Tokens.font.body.small
+                elide: Text.ElideRight
+            }
+        }
     }
 }

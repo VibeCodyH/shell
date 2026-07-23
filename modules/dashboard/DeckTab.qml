@@ -21,21 +21,34 @@ Item {
         anchors.top: parent.top
         spacing: Tokens.spacing.medium
 
-        StyledRect {
-            Layout.fillWidth: true
-            Layout.preferredHeight: brief.implicitHeight + Tokens.padding.large * 2
-
-            color: Colours.tPalette.m3surfaceContainer
-            radius: Tokens.rounding.extraLarge
-
+        Card {
             BriefCard {
-                id: brief
-
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
                 anchors.margins: Tokens.padding.large
             }
         }
+
+        Card {
+            TriageCard {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: Tokens.padding.large
+            }
+        }
+    }
+
+    component Card: StyledRect {
+        default property Item content
+
+        Layout.fillWidth: true
+        Layout.preferredHeight: (content?.implicitHeight ?? 0) + Tokens.padding.large * 2
+
+        color: Colours.tPalette.m3surfaceContainer
+        radius: Tokens.rounding.extraLarge
+
+        children: content ? [content] : []
     }
 }
