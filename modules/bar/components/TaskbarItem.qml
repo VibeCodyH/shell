@@ -6,6 +6,7 @@ import Quickshell.Widgets
 import Caelestia.Config
 import qs.components
 import qs.services
+import qs.utils
 
 StyledRect {
     id: root
@@ -15,7 +16,14 @@ StyledRect {
 
     readonly property var ipcObject: modelData?.lastIpcObject ?? null
     readonly property string appClass: ipcObject?.class ?? ""
-    readonly property DesktopEntry desktopEntry: appClass ? DesktopEntries.heuristicLookup(appClass) : null
+    readonly property string appIcon: {
+        // WM class usually matches the theme icon name directly; fall back to the desktop entry
+        const byClass = appClass ? Quickshell.iconPath(appClass, true) : "";
+        if (byClass)
+            return byClass;
+        const entryIcon = DesktopEntries.heuristicLookup(appClass)?.icon ?? "";
+        return entryIcon ? Quickshell.iconPath(entryIcon, true) : "";
+    }
     readonly property bool active: modelData === Hypr.activeToplevel
 
     function focusWindow(): void {
@@ -41,14 +49,14 @@ StyledRect {
         anchors.margins: Tokens.padding.extraSmall
 
         asynchronous: true
-        visible: root.desktopEntry !== null
-        source: Quickshell.iconPath(root.desktopEntry?.icon, "image-missing")
+        visible: root.appIcon !== ""
+        source: root.appIcon
     }
 
     MaterialIcon {
         anchors.centerIn: parent
 
-        visible: root.desktopEntry === null
+        visible: root.appIcon === ""
         text: Icons.getAppCategoryIcon(root.appClass, "desktop_windows")
         color: root.active ? Colours.palette.m3onPrimaryContainer : Colours.palette.m3onSurfaceVariant
         fontStyle: Tokens.font.icon.medium
