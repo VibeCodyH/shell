@@ -155,6 +155,16 @@ GridLayout {
                 }
             }
             DelegateChoice {
+                roleValue: "taskbar"
+                delegate: EntryWrapper {
+                    Taskbar {
+                        objectName: "taskbarTaskbar"
+                        screen: root.screen
+                        horizontal: root.horizontal
+                    }
+                }
+            }
+            DelegateChoice {
                 roleValue: "activeWindow"
                 delegate: EntryWrapper {
                     ActiveWindow {
