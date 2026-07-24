@@ -24,15 +24,6 @@ Item {
         return x > 0 ? 0 : 1;
     }
 
-    // Anchored, not y-bound: a Behavior-lagged y would dip the clip area into the bar while height animates
-    anchors.bottom: position === "bottom" && !content.isDetached ? parent.bottom : undefined
-
-    visible: width > 0 && height > 0
-    clip: true
-
-    implicitWidth: horizontal ? content.implicitWidth : content.implicitWidth * (1 - offsetScale)
-    implicitHeight: horizontal ? content.implicitHeight * (1 - offsetScale) : content.implicitHeight
-
     // Where the popout is headed, before the Behaviors below lag it there. Bindings that need to
     // reason about the popout's real place — hover containment above all — must use these rather
     // than the animated x/y, which spend the whole open transition somewhere the popout is not.
@@ -79,6 +70,15 @@ Item {
             return 0;
         return targetY;
     }
+
+    // Anchored, not y-bound: a Behavior-lagged y would dip the clip area into the bar while height animates
+    anchors.bottom: position === "bottom" && !content.isDetached ? parent.bottom : undefined
+
+    visible: width > 0 && height > 0
+    clip: true
+
+    implicitWidth: horizontal ? content.implicitWidth : content.implicitWidth * (1 - offsetScale)
+    implicitHeight: horizontal ? content.implicitHeight * (1 - offsetScale) : content.implicitHeight
 
     x: targetX
     y: targetY
