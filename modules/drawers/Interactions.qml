@@ -69,6 +69,13 @@ CustomMouseArea {
         return x < panelX + w && y >= top - Config.border.rounding && y <= top + h + Config.border.rounding;
     }
 
+    function shouldClosePopout(x: real, y: real): bool {
+        // A tray menu drilled past its root stays put until dismissed
+        if (popouts.currentName.startsWith("traymenu") && ((popouts.current as StackView)?.depth ?? 0) > 1)
+            return false;
+        return !inPopoutArea(x, y);
+    }
+
     function inDashboardArea(x: real, y: real): bool {
         if (geometry.dashboardOnLeft) {
             if (geometry.barOnLeft && geometry.barContains(x, y))
@@ -96,6 +103,10 @@ CustomMouseArea {
     onPressed: event => dragStart = Qt.point(event.x, event.y)
     onContainsMouseChanged: {
         if (!containsMouse) {
+            // mouseX/mouseY freeze at the exit point, so a queued re-test would read a stale
+            // position. Leaving the area closes outright anyway.
+            popoutCloseTimer.stop();
+
             // Only hide if not activated by shortcut
             if (!osdShortcutActive) {
                 screenState.osd = false;
@@ -277,10 +288,31 @@ CustomMouseArea {
 
         // Show popouts on hover
         if (geometry.barContains(x, y)) {
+            popoutCloseTimer.stop();
             bar.checkPopout(geometry.axisPos(x, y));
-        } else if ((!popouts.currentName.startsWith("traymenu") || ((popouts.current as StackView)?.depth ?? 0) <= 1) && !inPopoutArea(x, y)) {
-            popouts.hasCurrent = false;
-            bar.closeTray();
+        } else if (shouldClosePopout(x, y)) {
+            // start, not restart: a moving cursor must not push the deadline ahead of itself
+            popoutCloseTimer.start();
+        } else {
+            popoutCloseTimer.stop();
+        }
+    }
+
+    // Grace period before a popout closes. There is no rect that catches every pointer sample on
+    // the way from the bar into the popout: a fast flick moves far enough between samples that one
+    // can land in neither, and that single sample used to close the popout for good. Defer the
+    // close and re-test when it fires — by then any in-flight geometry has settled, and if the
+    // cursor came to rest inside the popout no further move event would arrive to correct it.
+    Timer {
+        id: popoutCloseTimer
+
+        interval: root.popouts.animLength
+        onTriggered: {
+            if (root.popouts.isDetached || root.geometry.barContains(root.mouseX, root.mouseY) || !root.shouldClosePopout(root.mouseX, root.mouseY))
+                return;
+
+            root.popouts.hasCurrent = false;
+            root.bar.closeTray();
         }
     }
 
