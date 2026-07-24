@@ -64,9 +64,17 @@ CustomMouseArea {
         const h = Math.max(panel.height, popouts.nonAnimHeight);
         const panelX = geometry.insetLeft(borderThickness) + panel.x;
         const panelY = geometry.insetTop(borderThickness) + panel.y;
-        // Grow from the edge the popout is pinned to, not the one it animates away from
-        const top = geometry.barOnBottom ? panelY + panel.height - h : panelY;
-        return x < panelX + w && y >= top - Config.border.rounding && y <= top + h + Config.border.rounding;
+        // Bound the popout only on the side facing AWAY from the bar. Between the two sits a
+        // hairline of border and inset that belongs to neither, and a cursor crossing or resting
+        // in it must not read as having left. Reaching past the popout into the bar is harmless:
+        // the barContains branch is tested first and wins. Grow from the pinned edge, not the one
+        // the popout animates away from.
+        const r = Config.border.rounding;
+        if (geometry.barOnBottom)
+            return x < panelX + w && y >= panelY + panel.height - h - r;
+        if (geometry.barOnTop)
+            return x < panelX + w && y <= panelY + h + r;
+        return x < panelX + w && y >= panelY - r && y <= panelY + h + r;
     }
 
     function shouldClosePopout(x: real, y: real): bool {

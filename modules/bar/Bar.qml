@@ -78,10 +78,12 @@ GridLayout {
         if (ch?.entryId !== "tray")
             closeTray();
 
-        if (!ch) {
-            popouts.hasCurrent = false;
+        // childAt finds nothing in the layout spacing between two entries. That gap is dead space,
+        // not an intent to dismiss: drifting a hair off an icon on the way up into that icon's own
+        // popout lands here and used to close it instantly. Hold whatever is open — hovering an
+        // entry that owns no popout still closes it, as does leaving the bar.
+        if (!ch)
             return;
-        }
 
         const id = ch.entryId;
         const start = horizontal ? ch.x : ch.y;
