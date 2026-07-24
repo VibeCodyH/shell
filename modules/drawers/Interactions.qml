@@ -77,11 +77,13 @@ CustomMouseArea {
         return x < panelX + w && y >= panelY - r && y <= panelY + h + r;
     }
 
+    // A tray menu drilled past its root stays put until dismissed
+    function popoutPinned(): bool {
+        return popouts.currentName.startsWith("traymenu") && ((popouts.current as StackView)?.depth ?? 0) > 1;
+    }
+
     function shouldClosePopout(x: real, y: real): bool {
-        // A tray menu drilled past its root stays put until dismissed
-        if (popouts.currentName.startsWith("traymenu") && ((popouts.current as StackView)?.depth ?? 0) > 1)
-            return false;
-        return !inPopoutArea(x, y);
+        return !popoutPinned() && !inPopoutArea(x, y);
     }
 
     function inDashboardArea(x: real, y: real): bool {
@@ -111,10 +113,6 @@ CustomMouseArea {
     onPressed: event => dragStart = Qt.point(event.x, event.y)
     onContainsMouseChanged: {
         if (!containsMouse) {
-            // mouseX/mouseY freeze at the exit point, so a queued re-test would read a stale
-            // position. Leaving the area closes outright anyway.
-            popoutCloseTimer.stop();
-
             // Only hide if not activated by shortcut
             if (!osdShortcutActive) {
                 screenState.osd = false;
@@ -127,10 +125,12 @@ CustomMouseArea {
             if (!utilitiesShortcutActive)
                 screenState.utilities = false;
 
-            if (!popouts.currentName.startsWith("traymenu") || ((popouts.current as StackView)?.depth ?? 0) <= 1) {
-                popouts.hasCurrent = false;
-                bar.closeTray();
-            }
+            // Deferred, not immediate. The compositor commits the input mask a frame behind the
+            // popout it exposes, so a cursor moving quickly onto a popout that has just grown is
+            // handed to the window underneath for an instant and arrives here as a leave. Waiting
+            // tells the two apart by the only thing that differs: a spurious leave comes straight
+            // back, a real one does not.
+            popoutCloseTimer.start();
 
             if (Config.bar.showOnHover)
                 bar.isHovered = false;
@@ -316,10 +316,13 @@ CustomMouseArea {
 
         interval: root.popouts.animLength
         onTriggered: {
-            if (root.popouts.isDetached || root.geometry.barContains(root.mouseX, root.mouseY))
+            if (root.popouts.isDetached || root.popoutPinned())
                 return;
 
-            if (!root.shouldClosePopout(root.mouseX, root.mouseY))
+            // Still inside the shell: the cursor's position decides, and by now any geometry it was
+            // chasing has landed. Still outside it: the pointer never came back, so that leave was
+            // real rather than the frame of hand-off while the mask caught up.
+            if (root.containsMouse && (root.geometry.barContains(root.mouseX, root.mouseY) || root.inPopoutArea(root.mouseX, root.mouseY)))
                 return;
 
             root.popouts.hasCurrent = false;
