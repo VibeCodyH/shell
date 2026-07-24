@@ -52,6 +52,23 @@ CustomMouseArea {
         return y > height - Math.max(Config.border.minThickness, geometry.insetBottom(Config.border.thickness) + panelHeight) - (isCorner ? Config.border.rounding : 0) && withinPanelWidth(panel, x, y);
     }
 
+    // Keep-open test for the bar popouts. The popout wrapper animates open — its size grows from
+    // zero and, on a bottom bar, its y trails that growth — so for the first frames the region is
+    // a sliver pinned to the bar. Testing the cursor against that CURRENT rect closes the popout
+    // whenever you leave the bar faster than it grows, which is why it only survived a slow move.
+    // Test the size it is animating toward instead. Every term here only widens what inLeftPanel
+    // already accepted (the x bound stays one-sided), so no bar position loses hover.
+    function inPopoutArea(x: real, y: real): bool {
+        const panel = panels.popoutsWrapper;
+        const w = Math.max(panel.width, popouts.nonAnimWidth);
+        const h = Math.max(panel.height, popouts.nonAnimHeight);
+        const panelX = geometry.insetLeft(borderThickness) + panel.x;
+        const panelY = geometry.insetTop(borderThickness) + panel.y;
+        // Grow from the edge the popout is pinned to, not the one it animates away from
+        const top = geometry.barOnBottom ? panelY + panel.height - h : panelY;
+        return x < panelX + w && y >= top - Config.border.rounding && y <= top + h + Config.border.rounding;
+    }
+
     function inDashboardArea(x: real, y: real): bool {
         if (geometry.dashboardOnLeft) {
             if (geometry.barOnLeft && geometry.barContains(x, y))
@@ -261,7 +278,7 @@ CustomMouseArea {
         // Show popouts on hover
         if (geometry.barContains(x, y)) {
             bar.checkPopout(geometry.axisPos(x, y));
-        } else if ((!popouts.currentName.startsWith("traymenu") || ((popouts.current as StackView)?.depth ?? 0) <= 1) && !inLeftPanel(panels.popoutsWrapper, x, y)) {
+        } else if ((!popouts.currentName.startsWith("traymenu") || ((popouts.current as StackView)?.depth ?? 0) <= 1) && !inPopoutArea(x, y)) {
             popouts.hasCurrent = false;
             bar.closeTray();
         }
