@@ -19,6 +19,16 @@ CustomMouseArea {
     required property real borderThickness
     required property bool fullscreen
 
+    // How long a popout lingers after the pointer leaves before it closes. TUNABLE — this is the
+    // one number that trades the two failure modes against each other. Too short and a cursor
+    // moving quickly from the bar into a popout gets dismissed on the way, because it crosses the
+    // seam between the two, or the frame in which the compositor is still catching up with the
+    // input mask, faster than the grace can cover. Too long and popouts feel sticky when you
+    // deliberately move away. The default follows the popout's own open animation: the shortest
+    // value guaranteed to outlast any geometry the cursor might be chasing. Config durations scale,
+    // so this scales with them rather than being a literal.
+    property int popoutCloseDelay: popouts.animLength
+
     property point dragStart
     property bool dashboardShortcutActive
     property bool osdShortcutActive
@@ -314,7 +324,7 @@ CustomMouseArea {
     Timer {
         id: popoutCloseTimer
 
-        interval: root.popouts.animLength
+        interval: root.popoutCloseDelay
         onTriggered: {
             if (root.popouts.isDetached || root.popoutPinned())
                 return;
