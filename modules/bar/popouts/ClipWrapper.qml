@@ -61,12 +61,6 @@ Item {
         return Math.max(off, 0);
     }
 
-    // True while any of the popout's geometry is still in flight — sliding between two bar entries,
-    // growing into a taller panel, or scaling up from the bar on open. Hover containment cannot be
-    // decided during that window: the popout is drawn where it has got to, not where it belongs, so
-    // a cursor heading for its resting place passes through empty space on the way.
-    readonly property bool settling: offsetScale > 0 || Math.abs(x - targetX) > 0.5 || (!horizontal && Math.abs(y - targetY) > 0.5) || Math.abs(content.implicitWidth - content.nonAnimWidth) > 0.5 || Math.abs(content.implicitHeight - content.nonAnimHeight) > 0.5
-
     // The rect the popout is settling into, in parent coordinates. The window's input mask
     // (modules/drawers/Regions.qml) is cut from this rather than from the animated geometry: an
     // interactive hole that lags what is drawn lets the pointer fall straight through the visible
