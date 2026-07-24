@@ -127,7 +127,10 @@ CustomMouseArea {
             if (!utilitiesShortcutActive)
                 screenState.utilities = false;
 
-            if (!popouts.currentName.startsWith("traymenu") || ((popouts.current as StackView)?.depth ?? 0) <= 1) {
+            // The mask is committed a frame behind the popout it exposes, so the pointer can still
+            // be handed away for an instant while resting inside a popout that is settling. That
+            // arrives here as a leave; hold the popout if the cursor is in fact still on it.
+            if (!inPopoutArea(mouseX, mouseY) && (!popouts.currentName.startsWith("traymenu") || ((popouts.current as StackView)?.depth ?? 0) <= 1)) {
                 popouts.hasCurrent = false;
                 bar.closeTray();
             }

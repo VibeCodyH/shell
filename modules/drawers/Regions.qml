@@ -68,10 +68,21 @@ Region {
         height: panel.height * (1 - root.panels.utilities.offsetScale) + root.geometry.insetBottom(root.borderThickness)
     }
 
+    // Union of where the popout is and where it is headed. Cut from the animated geometry alone,
+    // this hole lags the popout as it slides between two bar entries or grows out of the bar, so a
+    // cursor moving into the popout it just opened lands outside the mask and is handed to the
+    // window underneath — the shell sees a pointer leave and dismisses the popout the cursor was
+    // aiming for. Union so the hole only ever leads the animation, never trails it. No offsetScale
+    // factor here: ClipWrapper already applies it to the axis that collapses.
     R {
+        readonly property real unionX: Math.min(panel.x, panel.settledX)
+        readonly property real unionY: Math.min(panel.y, panel.settledY)
+
         panel: root.panels.popoutsWrapper
-        width: root.geometry.horizontal ? panel.width : panel.width * (1 - root.panels.popoutsWrapper.offsetScale)
-        height: root.geometry.horizontal ? panel.height * (1 - root.panels.popoutsWrapper.offsetScale) : panel.height
+        x: unionX + root.geometry.insetLeft(root.borderThickness)
+        y: unionY + root.geometry.insetTop(root.borderThickness)
+        width: Math.max(panel.x + panel.width, panel.settledX + panel.settledWidth) - unionX
+        height: Math.max(panel.y + panel.height, panel.settledY + panel.settledHeight) - unionY
     }
 
     component R: Region {

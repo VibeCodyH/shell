@@ -67,6 +67,25 @@ Item {
     // a cursor heading for its resting place passes through empty space on the way.
     readonly property bool settling: offsetScale > 0 || Math.abs(x - targetX) > 0.5 || (!horizontal && Math.abs(y - targetY) > 0.5) || Math.abs(content.implicitWidth - content.nonAnimWidth) > 0.5 || Math.abs(content.implicitHeight - content.nonAnimHeight) > 0.5
 
+    // The rect the popout is settling into, in parent coordinates. The window's input mask
+    // (modules/drawers/Regions.qml) is cut from this rather than from the animated geometry: an
+    // interactive hole that lags what is drawn lets the pointer fall straight through the visible
+    // popout to the window underneath. While closing there is nothing to settle into, so these
+    // track the live geometry and the hole shrinks with it.
+    readonly property bool opening: content.hasCurrent || content.isDetached
+    readonly property real settledWidth: opening ? content.nonAnimWidth : width
+    readonly property real settledHeight: opening ? content.nonAnimHeight : height
+    readonly property real settledX: opening ? targetX : x
+    readonly property real settledY: {
+        if (!opening)
+            return y;
+        if (position === "bottom")
+            return parent.height - settledHeight;
+        if (position === "top")
+            return 0;
+        return targetY;
+    }
+
     x: targetX
     y: targetY
 
