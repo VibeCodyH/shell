@@ -20,6 +20,37 @@ GridLayout {
     required property bool horizontal
     readonly property int axisPadding: Tokens.padding.large
 
+    // Keep the taskbar entry centered on the physical screen, not merely between its
+    // neighbours. The two fill spacers alone only centre it within the gap, so an
+    // uneven left/right cluster (e.g. lone logo vs. tray+clock+status+power) pushes it
+    // off-centre. Compensate by padding the taskbar by the width delta of the fixed
+    // (non-spacer) entries on each side. Uses implicitWidth only, so it never feeds the
+    // laid-out width back into the layout (no binding loop).
+    readonly property real taskbarCenterDelta: {
+        let ti = -1;
+        for (let i = 0; i < repeater.count; i++)
+            if (repeater.itemAt(i)?.entryId === "taskbar") {
+                ti = i;
+                break;
+            }
+        if (ti < 0)
+            return 0;
+        const spacing = horizontal ? columnSpacing : rowSpacing;
+        let before = 0;
+        let after = 0;
+        for (let i = 0; i < repeater.count; i++) {
+            const w = repeater.itemAt(i);
+            if (i === ti || !w || w.entryId === "spacer")
+                continue;
+            const extent = (horizontal ? w.implicitWidth : w.implicitHeight) + spacing;
+            if (i < ti)
+                before += extent;
+            else
+                after += extent;
+        }
+        return after - before;
+    }
+
     function closeTray(): void {
         if (!Config.bar.tray.compact)
             return;
@@ -91,6 +122,10 @@ GridLayout {
                 popouts.currentCenter = Qt.binding(() => axisCenterOf(item));
                 popouts.hasCurrent = true;
             }
+        } else if (id === "phoneTools") {
+            popouts.currentName = "phone";
+            popouts.currentCenter = Qt.binding(() => axisCenterOf(ch.item as Item));
+            popouts.hasCurrent = true;
         } else if (id === "power" && horizontal) {
             popouts.hasCurrent = false;
         }
@@ -163,8 +198,21 @@ GridLayout {
                 }
             }
             DelegateChoice {
+                roleValue: "workdayLayout"
+                delegate: EntryWrapper {
+                    WorkdayButton {
+                        objectName: "taskbarWorkdayLayout"
+                    }
+                }
+            }
+            DelegateChoice {
                 roleValue: "taskbar"
                 delegate: EntryWrapper {
+                    Layout.leftMargin: root.horizontal ? Math.max(0, root.taskbarCenterDelta) : 0
+                    Layout.rightMargin: root.horizontal ? Math.max(0, -root.taskbarCenterDelta) : 0
+                    Layout.topMargin: root.horizontal ? 0 : Math.max(0, root.taskbarCenterDelta)
+                    Layout.bottomMargin: root.horizontal ? 0 : Math.max(0, -root.taskbarCenterDelta)
+
                     Taskbar {
                         objectName: "taskbarTaskbar"
                         screen: root.screen
@@ -207,6 +255,14 @@ GridLayout {
                     StatusIcons {
                         objectName: "taskbarStatusIcons"
                         horizontal: root.horizontal
+                    }
+                }
+            }
+            DelegateChoice {
+                roleValue: "phoneTools"
+                delegate: EntryWrapper {
+                    PhoneButton {
+                        objectName: "taskbarPhoneTools"
                     }
                 }
             }

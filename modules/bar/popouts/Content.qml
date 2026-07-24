@@ -127,9 +127,16 @@ Item {
             sourceComponent: LockStatus {}
         }
 
+        Popout {
+            name: "phone"
+            sourceComponent: PhoneTools {}
+        }
+
         Repeater {
             model: ScriptModel {
-                values: Services.Hypr.toplevels.values
+                // Same order as the taskbar icons — otherwise preview N shows a different window
+                // than icon N once the order is customised. See services/TaskbarOrder.qml.
+                values: Services.TaskbarOrder.sorted(Services.Hypr.toplevels.values)
             }
 
             Popout {
