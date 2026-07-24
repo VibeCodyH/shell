@@ -33,7 +33,10 @@ Item {
     implicitWidth: horizontal ? content.implicitWidth : content.implicitWidth * (1 - offsetScale)
     implicitHeight: horizontal ? content.implicitHeight * (1 - offsetScale) : content.implicitHeight
 
-    x: {
+    // Where the popout is headed, before the Behaviors below lag it there. Bindings that need to
+    // reason about the popout's real place — hover containment above all — must use these rather
+    // than the animated x/y, which spend the whole open transition somewhere the popout is not.
+    readonly property real targetX: {
         if (content.isDetached)
             return (parent.width - content.nonAnimWidth) / 2;
         if (!horizontal)
@@ -45,7 +48,7 @@ Item {
             return off + diff;
         return Math.max(off, 0);
     }
-    y: {
+    readonly property real targetY: {
         if (content.isDetached)
             return (parent.height - content.nonAnimHeight) / 2;
         if (horizontal)
@@ -57,6 +60,15 @@ Item {
             return off + diff;
         return Math.max(off, 0);
     }
+
+    // True while any of the popout's geometry is still in flight — sliding between two bar entries,
+    // growing into a taller panel, or scaling up from the bar on open. Hover containment cannot be
+    // decided during that window: the popout is drawn where it has got to, not where it belongs, so
+    // a cursor heading for its resting place passes through empty space on the way.
+    readonly property bool settling: offsetScale > 0 || Math.abs(x - targetX) > 0.5 || (!horizontal && Math.abs(y - targetY) > 0.5) || Math.abs(content.implicitWidth - content.nonAnimWidth) > 0.5 || Math.abs(content.implicitHeight - content.nonAnimHeight) > 0.5
+
+    x: targetX
+    y: targetY
 
     Behavior on offsetScale {
         Anim {}
